@@ -1,10 +1,15 @@
 name: build
-on: push
+on: 
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: ${{ github.event_name == 'push'}}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -25,6 +30,17 @@ jobs:
   format:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: ${{ github.event_name == 'push'}}
     steps:
       - name: Run black formatter
         uses: rickstaa/action-black@v1.3.3
+
+  coverage:
+      runs-on: ubuntu-latest
+      timeout-minutes: 10
+      if: ${{ github.event_name == 'pull_request'}}
+      steps:
+        - name: Pytest Coverage Commentator
+          uses: coroo/pytest-coverage-commentator@v1.0.2
+          with:
+            pytest-coverage: pytest-coverage.txt
